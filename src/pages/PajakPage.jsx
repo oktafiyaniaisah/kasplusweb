@@ -1,51 +1,71 @@
-// pages/PajakPage.jsx
-import Sidebar from '../components/Sidebar';
+import { useState } from "react";
+import Sidebar from "../components/Sidebar";
+
+const pajakRates = {
+  PPN: 0.11,      // 11%
+  PPh21: 0.05,    // 5%
+  PPh23: 0.02,    // 2%
+};
 
 export default function PajakPage() {
-  const pendapatan = 12000000;
-  const pajakPersen = 10;
-  const estimasiPajak = (pendapatan * pajakPersen) / 100;
+  const [pendapatan, setPendapatan] = useState("");
+  const [jenisPajak, setJenisPajak] = useState("PPN");
+  const [hasilPajak, setHasilPajak] = useState(null);
+
+  function hitungPajak() {
+    const pendapatanNum = parseFloat(pendapatan);
+    if (isNaN(pendapatanNum) || pendapatanNum <= 0) {
+      alert("Masukkan total pendapatan yang valid!");
+      return;
+    }
+    const rate = pajakRates[jenisPajak] || 0;
+    const pajak = pendapatanNum * rate;
+    setHasilPajak(pajak);
+  }
 
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="ml-64 p-8 w-full">
+      <div className="ml-64 p-8 w-full max-w-lg">
         <h1 className="text-3xl font-bold text-green-800 mb-6">Perhitungan Pajak</h1>
 
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-xl">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Total Pendapatan</label>
+        <div className="bg-white p-6 rounded-lg shadow-md space-y-5">
+          <div>
+            <label className="block font-semibold mb-2">Total Pendapatan (Rp)</label>
             <input
               type="number"
               value={pendapatan}
-              disabled
-              className="mt-1 block w-full border px-3 py-2 rounded"
+              onChange={(e) => setPendapatan(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+              placeholder="Masukkan total pendapatan"
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Persentase Pajak (%)</label>
-            <input
-              type="number"
-              value={pajakPersen}
-              disabled
-              className="mt-1 block w-full border px-3 py-2 rounded"
-            />
+          <div>
+            <label className="block font-semibold mb-2">Jenis Pajak</label>
+            <select
+              value={jenisPajak}
+              onChange={(e) => setJenisPajak(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+            >
+              <option value="PPN">PPN (11%)</option>
+              <option value="PPh21">PPh 21 (5%)</option>
+              <option value="PPh23">PPh 23 (2%)</option>
+            </select>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700">Estimasi Pajak</label>
-            <input
-              type="text"
-              value={`Rp ${estimasiPajak.toLocaleString()}`}
-              disabled
-              className="mt-1 block w-full border px-3 py-2 rounded bg-gray-100 text-green-800 font-bold"
-            />
-          </div>
-
-          <button className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-600 w-full">
-            Simpan Laporan Pajak
+          <button
+            onClick={hitungPajak}
+            className="w-full bg-green-700 hover:bg-green-600 text-white py-2 rounded-lg font-semibold"
+          >
+            Hitung Pajak
           </button>
+
+          {hasilPajak !== null && (
+            <div className="mt-4 p-4 bg-green-100 text-green-800 rounded font-semibold">
+              Pajak yang harus dibayar: Rp {hasilPajak.toLocaleString()}
+            </div>
+          )}
         </div>
       </div>
     </div>
